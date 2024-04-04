@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class Main {
@@ -20,19 +21,21 @@ public class Main {
             boolean isDirectory = file.isDirectory();
 
             if (!fileExist) {
-                System.out.println("Указанный файл не существует"); continue;
+                System.out.println("Указанный файл не существует");
+                continue;
             }
             if (isDirectory) {
-                System.out.println("Указан путь к папке, а не к файлу"); continue;
+                System.out.println("Указан путь к папке, а не к файлу");
+                continue;
             }
             counter++;
             System.out.println("Путь указан верно");
             System.out.println("Это файл № " + counter);
 
-            //Блок для чтения строк указанного файла и поиска самой длинной и короткой строки, а так же общего количества строк
+            //Блок для чтения строк указанного файла и поиска запросов от GoogleBot и YandexBot
             int linesCounter = 0;
-            int longestLine = 0;
-            ArrayList<Integer> tmp = new ArrayList<>();
+            int googleBots = 0;
+            int yandexBots = 0;
 
             try {
                 FileReader fileReader = new FileReader(path);
@@ -43,22 +46,48 @@ public class Main {
                     linesCounter++;
                     int length = line.length();
                     if (length > 1024) throw new RuntimeException("Строка не должна содержать более 1024 символа");
-                    if (length > longestLine) longestLine = length;
-                    tmp.add(length);
+                    if (isYandexBot(processUserAgent(getUserAgent(line)))) yandexBots++;
+                    if (isGoogleBot(processUserAgent(getUserAgent(line)))) googleBots++;
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            int shortestLine = tmp.get(0);
-            for (int i = 1; i < tmp.size(); i++) {
-                if (shortestLine > tmp.get(i)) shortestLine = tmp.get(i);
-            }
             System.out.println("Всего строк в файле: " + linesCounter);
-            System.out.println("Самая длинная строка содержит символов: " + longestLine);
-            System.out.println("Самая короткая строка содержит символов : " + shortestLine);
+
+            double yandexRequests = (double) yandexBots/linesCounter * 100;
+            double googleRequests = (double) googleBots/linesCounter * 100;
+            System.out.println("Запросов от YandexBot: "+ yandexBots + " (" + yandexRequests + "% от всех запросов)");
+            System.out.println("Запросов от GoogleBot: "+ googleBots + " (" + googleRequests + "% от всех запросов)");
+
+
         }
 
-
-
     }
+
+    //метод для выделения User-Agent
+    public static String getUserAgent(String str) {
+        String[] res = str.split("\" \"");
+        return res[res.length - 1];
+    }
+
+
+    //метод принимает строку с User-Agent и обрабатывает его, отрезая лишние части и удаляет пробелы
+    public static String processUserAgent(String str) {
+        String[] tmp = str.split("compatible;");
+        String processing;
+        if (tmp.length >= 2) {
+            processing = tmp[1].trim();
+        } else processing = tmp[0].trim();
+        String[] res = processing.split("/");
+        return res[0];
+    }
+
+    public static boolean isYandexBot(String str){
+        return str.equals("YandexBot");
+    }
+    public static boolean isGoogleBot(String str){
+        return str.equals("Googlebot");
+    }
+
+
 }
