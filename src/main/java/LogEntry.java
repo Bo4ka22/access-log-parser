@@ -87,9 +87,17 @@ public class LogEntry {
     //Метод принимает строку userAgent и возвращает ОС
     public static String getOSFromUserAgent(String str){
         String[] tmp1 = str.split("\\(");
+        if (tmp1.length > 1){
         String[] tmp2 = tmp1[1].split(";");
         String[] res = tmp2[0].split(" ");
-        return res[0];
+            return switch (res[0]) {
+                case ("Windows") -> "Windows";
+                case ("Linux") -> "Linux";
+                case ("Macintosh") -> "macOS";
+                default -> "other";
+            };
+        }
+        return "other";
     }
 
     //Метод разбирает переданную строку лога на запчасти и раскладывает по элементам массива отдельные составные. Выглядит ужасно, но работает

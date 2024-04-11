@@ -53,6 +53,7 @@ public class Main {
                     //Создаём объект LogEntry и передаём его в сборщик статистики
                     LogEntry entry = new LogEntry(line);
                     stat.addEntry(entry);
+
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -64,6 +65,8 @@ public class Main {
             System.out.println("Запросов от YandexBot: "+ yandexBots + " (" + yandexRequests + "% от всех запросов)");
             System.out.println("Запросов от GoogleBot: "+ googleBots + " (" + googleRequests + "% от всех запросов)");
             System.out.println("Средний объём траффика (в байтах) за час: " + stat.getTrafficRate());
+            System.out.println("Распределение запросов в разресе операционных систем: ");
+            System.out.println(stat.getOSUsage());
         }
 
     }
