@@ -65,8 +65,15 @@ public class Main {
             System.out.println("Запросов от YandexBot: "+ yandexBots + " (" + yandexRequests + "% от всех запросов)");
             System.out.println("Запросов от GoogleBot: "+ googleBots + " (" + googleRequests + "% от всех запросов)");
             System.out.println("Средний объём траффика (в байтах) за час: " + stat.getTrafficRate());
+            System.out.println("-------------");
             System.out.println("Распределение запросов в разресе операционных систем: ");
             System.out.println(stat.getOSUsage());
+            System.out.println("-------------");
+            System.out.println("Распределение запросов в разресе браузеров: ");
+            System.out.println(stat.getBrowsersUsage());
+            System.out.println("-------------");
+            System.out.println("Список эндпоинтов, которые вернули ошибку 404: ");
+            System.out.println(stat.getPathNotFound());
         }
 
     }

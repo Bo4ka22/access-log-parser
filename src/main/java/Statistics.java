@@ -13,6 +13,9 @@ public class Statistics {
 
      private  HashMap<String, Integer> osCounter = new HashMap<>();
 
+     private HashSet<String> pathNotFound = new HashSet<>();
+     private HashMap<String, Integer> browsersCounter = new HashMap<>();
+
     public Statistics() {
         this.minTime = LocalDateTime.now();
         this.maxTime = LocalDateTime.MIN;
@@ -29,6 +32,16 @@ public class Statistics {
             osCounter.put(LogEntry.getOSFromUserAgent(entry.getUserAgent()), 1);
         } else {
             osCounter.put(LogEntry.getOSFromUserAgent(entry.getUserAgent()), osCounter.get(LogEntry.getOSFromUserAgent(entry.getUserAgent()))+1);
+        }
+
+        //—обираем все path, у которых код ответа 404
+        if (entry.getResponseCode()==404) pathNotFound.add(entry.getPath());
+
+        //ѕровер€ем, есть ли в мапе данный браузер. ≈сли есть, то прибавл€ем единицу использований. ≈сли нет, то добавл€ем его с 1 использованием
+        if (!browsersCounter.containsKey(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()))){
+            browsersCounter.put(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()), 1);
+        } else {
+            browsersCounter.put(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()), browsersCounter.get(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()))+1);
         }
     }
 
@@ -52,6 +65,25 @@ public class Statistics {
             res.put(key, (double)osCounter.get(key) / osTotal);
         }
         return res;
+    }
+
+    public HashMap<String, Double> getBrowsersUsage(){
+        int browsersTotal = 0;
+        HashMap<String, Double> res = new HashMap<>();
+        List<Integer> values = new ArrayList<>(browsersCounter.values());
+        for (Integer integer : values) {
+            values.size();
+            browsersTotal += integer;
+        }
+        List<String> keys = new ArrayList<>(browsersCounter.keySet());
+        for (String key: keys) {
+            res.put(key, (double)browsersCounter.get(key) / browsersTotal);
+        }
+        return res;
+    }
+
+    public HashSet<String> getPathNotFound(){
+        return new HashSet<>(pathNotFound);
     }
 
 

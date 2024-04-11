@@ -79,9 +79,20 @@ public class LogEntry {
 
     //Метод принимает строку userAgent и возвращает используемый браузер
     public static String getBrowserFromUserAgent(String str){
-        String[] tmp1 = str.split(" ");
-        String[] res = tmp1[tmp1.length-1].split("/");
-        return res[0];
+        //Решение со сплитом работает не корректно из-за неконсистентности данных в строках.
+        //Сделал тупой проверкой на наличие одного из вариантов
+        String[] browsers = new String[5];
+        browsers[0] = "edge";
+        browsers[1] = "opera";
+        browsers[2] = "safari";
+        browsers[3] = "chrome";
+        browsers[4] = "firefox";
+        for (String browser : browsers) {
+            if (str.toLowerCase().contains(browser)) {
+                return browser;
+            }
+        }
+        return "Other";
     }
 
     //Метод принимает строку userAgent и возвращает ОС
@@ -90,10 +101,10 @@ public class LogEntry {
         if (tmp1.length > 1){
         String[] tmp2 = tmp1[1].split(";");
         String[] res = tmp2[0].split(" ");
-            return switch (res[0]) {
-                case ("Windows") -> "Windows";
-                case ("Linux") -> "Linux";
-                case ("Macintosh") -> "macOS";
+            return switch (res[0].toLowerCase()) {
+                case ("windows") -> "Windows";
+                case ("linux") -> "Linux";
+                case ("macintosh") -> "macOS";
                 default -> "other";
             };
         }
