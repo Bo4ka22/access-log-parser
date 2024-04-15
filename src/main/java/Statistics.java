@@ -15,6 +15,11 @@ public class Statistics {
 
      private HashSet<String> pathNotFound = new HashSet<>();
      private HashMap<String, Integer> browsersCounter = new HashMap<>();
+     private int realVisitsCounter;
+
+     private int errorResponsesCounter;
+
+     private HashSet<String> uniqueAddresses = new HashSet<>();
 
     public Statistics() {
         this.minTime = LocalDateTime.now();
@@ -26,6 +31,7 @@ public class Statistics {
         if (entry.getTime().isBefore(minTime)) minTime = entry.getTime();
         if (entry.getTime().isAfter(maxTime)) maxTime = entry.getTime();
         if (entry.getResponseCode()==200) referers.add(entry.getReferer());
+        UserAgent agent = new UserAgent(entry.getUserAgent());
 
         //Проверяем, есть ли в мапе данная ОС. Если есть, то прибавляем единицу использований. Если нет, то добавляем её с 1 использованием
         if (!osCounter.containsKey(LogEntry.getOSFromUserAgent(entry.getUserAgent()))){
@@ -43,6 +49,19 @@ public class Statistics {
         } else {
             browsersCounter.put(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()), browsersCounter.get(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()))+1);
         }
+
+        //Проверяем кто посещал: если реальный браузер, то добавляем к счётчику. Если бот - игнорируем
+        if (!agent.isBot()) realVisitsCounter++;
+
+        //Считаем количество ответов с ошибками 4хх и 5хх
+        if(entry.getResponseCode() >= 400 && entry.getResponseCode() < 600){
+            errorResponsesCounter++;
+        }
+
+        //Собираем уникальные ip адреса
+        uniqueAddresses.add(entry.getIpAddr());
+
+
     }
 
     public long getTrafficRate(){
@@ -86,6 +105,17 @@ public class Statistics {
         return new HashSet<>(pathNotFound);
     }
 
+    public double getAverageVisitsPerHour(){
+        return (double) realVisitsCounter / ChronoUnit.HOURS.between(minTime,maxTime);
+    }
+
+    public double getErrorResponsesPerHour(){
+        return (double) errorResponsesCounter / ChronoUnit.HOURS.between(minTime,maxTime);
+    }
+
+    public double getAverageVisitsByOnePerson(){
+        return (double) realVisitsCounter / uniqueAddresses.size();
+    }
 
 
 }

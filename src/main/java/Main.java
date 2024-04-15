@@ -66,14 +66,17 @@ public class Main {
             System.out.println("Запросов от GoogleBot: "+ googleBots + " (" + googleRequests + "% от всех запросов)");
             System.out.println("Средний объём траффика (в байтах) за час: " + stat.getTrafficRate());
             System.out.println("-------------");
-            System.out.println("Распределение запросов в разресе операционных систем: ");
-            System.out.println(stat.getOSUsage());
+            System.out.println("Распределение запросов в разресе операционных систем: " + stat.getOSUsage());
             System.out.println("-------------");
-            System.out.println("Распределение запросов в разресе браузеров: ");
-            System.out.println(stat.getBrowsersUsage());
+            System.out.println("Распределение запросов в разресе браузеров: " + stat.getBrowsersUsage());
             System.out.println("-------------");
-            System.out.println("Список эндпоинтов, которые вернули ошибку 404: ");
-            System.out.println(stat.getPathNotFound());
+            System.out.println("Список эндпоинтов, которые вернули ошибку 404: " + stat.getPathNotFound());
+            System.out.println("-------------");
+            System.out.println("Среднее количество посещений в час: " + stat.getAverageVisitsPerHour());
+            System.out.println("-------------");
+            System.out.println("Количество ответов с ошибками 4хх и 5хх в час: " + stat.getErrorResponsesPerHour());
+            System.out.println("-------------");
+            System.out.println("Среднее количество почещений одним пользователем: " + stat.getAverageVisitsByOnePerson());
         }
 
     }
