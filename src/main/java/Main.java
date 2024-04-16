@@ -77,6 +77,12 @@ public class Main {
             System.out.println("Количество ответов с ошибками 4хх и 5хх в час: " + stat.getErrorResponsesPerHour());
             System.out.println("-------------");
             System.out.println("Среднее количество почещений одним пользователем: " + stat.getAverageVisitsByOnePerson());
+            System.out.println("-------------");
+            System.out.println("Максимум запросов за одну секунду: " + stat.getHighestVisitsPerSecond());
+            System.out.println("Список доменов: ");
+            System.out.println(stat.getDomains());
+            System.out.println("-------------");
+            System.out.println("Максимум посещений от одного пользователя: " + stat.getMaximumVisitsByOnePerson());
         }
 
     }

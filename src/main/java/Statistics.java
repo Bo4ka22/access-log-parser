@@ -1,25 +1,21 @@
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Statistics {
      private long totalTraffic;
      private LocalDateTime minTime;
      private LocalDateTime maxTime;
      private HashSet<String> referers = new HashSet<>();
-
      private  HashMap<String, Integer> osCounter = new HashMap<>();
-
      private HashSet<String> pathNotFound = new HashSet<>();
      private HashMap<String, Integer> browsersCounter = new HashMap<>();
      private int realVisitsCounter;
-
      private int errorResponsesCounter;
-
      private HashSet<String> uniqueAddresses = new HashSet<>();
+     private HashMap<LocalDateTime, Integer> visitsEachSecond = new HashMap<>();
+     private HashSet<String> domainsList = new HashSet<>();
+     private HashMap<String, Integer> visitsByOnePerson = new HashMap<>();
 
     public Statistics() {
         this.minTime = LocalDateTime.now();
@@ -50,8 +46,25 @@ public class Statistics {
             browsersCounter.put(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()), browsersCounter.get(LogEntry.getBrowserFromUserAgent(entry.getUserAgent()))+1);
         }
 
-        //Проверяем кто посещал: если реальный браузер, то добавляем к счётчику. Если бот - игнорируем
-        if (!agent.isBot()) realVisitsCounter++;
+        if (!agent.isBot()) {
+            //Увеличиваем счётчик реальных посетителей
+            realVisitsCounter++;
+
+            //Заполняем map посещений за каждую секунду.
+            if (!visitsEachSecond.containsKey(entry.getTime())){
+                visitsEachSecond.put(entry.getTime(), 1);
+            } else {
+                visitsEachSecond.put(entry.getTime(), visitsEachSecond.get(entry.getTime())+1);
+            }
+
+            //Заполняем map посещений для каждого ip адреса.
+            if (!visitsByOnePerson.containsKey(entry.getIpAddr())){
+                visitsByOnePerson.put(entry.getIpAddr(), 1);
+            } else {
+                visitsByOnePerson.put(entry.getIpAddr(), visitsByOnePerson.get(entry.getIpAddr())+1);
+            }
+
+        }
 
         //Считаем количество ответов с ошибками 4хх и 5хх
         if(entry.getResponseCode() >= 400 && entry.getResponseCode() < 600){
@@ -60,6 +73,15 @@ public class Statistics {
 
         //Собираем уникальные ip адреса
         uniqueAddresses.add(entry.getIpAddr());
+
+        //Собираем домены referer'ов
+        if (entry.getReferer() != null){
+            String[] tmp = entry.getReferer().split("//");
+            if (tmp.length > 1){
+                String[] tmp2 = tmp[1].split("/");
+                domainsList.add(tmp2[0]);
+            }
+        }
 
 
     }
@@ -117,5 +139,16 @@ public class Statistics {
         return (double) realVisitsCounter / uniqueAddresses.size();
     }
 
+    public int getHighestVisitsPerSecond(){
+        return Collections.max(visitsEachSecond.entrySet(), Map.Entry.comparingByValue()).getValue();
+    }
+
+    public HashSet<String> getDomains(){
+        return new HashSet<>(domainsList);
+    }
+
+    public int getMaximumVisitsByOnePerson(){
+        return Collections.max(visitsByOnePerson.entrySet(), Map.Entry.comparingByValue()).getValue();
+    }
 
 }
